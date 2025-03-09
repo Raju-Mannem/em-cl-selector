@@ -7,7 +7,7 @@ const Navbar = () => {
       className="flex justify-between items-center height-10 width-full px-16 py-4 bg-slate-50
     border-b-4 shadow-xl shadow-blue-500/10 sticky top-0"
     >
-      <aside className="">
+      <aside>
         <Image
           src="/campuslogics.webp"
           width={150}
