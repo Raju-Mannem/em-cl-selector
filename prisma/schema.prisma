@@ -1,0 +1,19 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model college {
+  sno            Decimal @id @db.Decimal(30, 0)
+  institute_code String @unique
+  institute_name String
+  place          String?
+  district_name  String?
+  college_type   String?
+  co_educ        String?
+  affiliated_to  String?
+}
