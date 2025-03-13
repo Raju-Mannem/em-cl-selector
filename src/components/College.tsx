@@ -3,6 +3,7 @@ import { GET_ALL_COLLEGES } from "@/graphql/queries";
 import { useQuery } from "@apollo/client";
 import React, { useState } from "react";
 import { jsPDF } from "jspdf";
+import {autoTable} from "jspdf-autotable";
 
 interface CollegeProps {
   sno: number;
@@ -36,36 +37,51 @@ const College = () => {
   ];
   const [currentCollege, setCurrentCollege] = useState<CollegeProps[]>([]);
 
-  const doc = new jsPDF("p", "mm", "a4");
-
    const handlePDF = () => {
-    const table = document.getElementById("currentCollegeTable");
-    if (table) {
-      const imgURL = "/channels4_banner.jpg";
-      const imgWidth = 100;
-      const imgHeight = 10;
-      const xPos = (210 - imgWidth) / 2;
-      doc.addImage(imgURL, "WEBP", xPos, 10, imgWidth, imgHeight);  
-      doc.html(table, {
-        callback: function (doc) {
-          doc.save("eamcet_master_ts_colleges.pdf");
-        },
-        margin: [15, 10, 10, 10],
-        x: 10,
-        y: 10,
-        html2canvas: {
-          scale: 0.14,
-          width: 180,
-          height: 270,
-          x: 0,
-          y: 0,
-          logging: false,
-          useCORS: true,
-          letterRendering: true,
-        },
-      });
-    }
+    const doc = new jsPDF();
+    const imgURL = "/EAMCET INSTRUCTIONS_page-0001.jpg";
+    doc.addImage(imgURL, "PNG", 5, 10, 200, 250);  
+    
+    doc.addPage("p");
+    
+    const tableData = currentCollege.map((selectedClgs, index) => [
+      index+1,
+      selectedClgs.institute_code,
+      selectedClgs.institute_name,
+      selectedClgs.place,
+      selectedClgs.district_name,
+      selectedClgs.co_educ,
+	  selectedClgs.college_type,
+      selectedClgs.affiliated_to,
+    ]);
+
+    const tableColumn = [
+      "S.NO", "Institute Code", "Institute Name", "Place", "District", "College Type",
+      "Co-Educ", "Affiliated To"
+    ];
+    autoTable(doc,{
+      head: [tableColumn],
+      body: tableData,
+      margin: { top: 10 },
+      styles: { fontSize: 4 },
+      columnStyles: {
+        2: { cellWidth: 'auto', halign: 'left' },
+        0: { halign: 'center' },
+        1: { halign: 'center' },
+        3: { halign: 'left' },
+        4: { halign: 'center' },
+        5: { halign: 'center' },
+        6: { halign: 'center' },
+        7: { halign: 'center' },
+        8: { halign: 'center' }, 
+        
+      },
+      theme: 'grid',
+    });
+  
+    doc.save("eamcet-master-ts-colleges.pdf");
   };
+
 
   const handleCollege = (selectedCollege: CollegeProps) => {
     const collegeExists = currentCollege.some(
