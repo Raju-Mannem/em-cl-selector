@@ -4,6 +4,7 @@ import { useQuery } from "@apollo/client";
 import React, { useState } from "react";
 import { jsPDF } from "jspdf";
 import {autoTable} from "jspdf-autotable";
+import { toast } from 'sonner'
 
 interface CollegeProps {
   sno: number;
@@ -39,11 +40,12 @@ const College = () => {
 
    const handlePDF = () => {
     const doc = new jsPDF();
-    const imgURL = "/EAMCET INSTRUCTIONS_page-0001.jpg";
+    /** 
+	const imgURL = "/EAMCET INSTRUCTIONS_page-0001.jpg";
     doc.addImage(imgURL, "PNG", 5, 10, 200, 250);  
     
     doc.addPage("p");
-    
+    **/
     const tableData = currentCollege.map((selectedClgs, index) => [
       index+1,
       selectedClgs.institute_code,
@@ -88,6 +90,7 @@ const College = () => {
       (college) => college.institute_code === selectedCollege.institute_code
     );
     if (collegeExists) {
+	  toast.error(`${selectedCollege.institute_code} already existed`);
       alert("college already existed");
     }
     else{
@@ -95,6 +98,7 @@ const College = () => {
       ...prevColleges,
       selectedCollege as CollegeProps,
     ]);
+	toast.success(`${selectedCollege.institute_code} added successfully`);
   }
   };
 
