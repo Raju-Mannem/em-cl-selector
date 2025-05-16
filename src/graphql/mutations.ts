@@ -21,3 +21,85 @@ export const CREATE_COLLEGE = gql`
     )
   }
 `;
+
+export const CREATE_TS_CUTOFF_2025 = gql`
+  mutation CreateTsCutoff2025($data: TsCutoff2025Input!) {
+    createTsCutoff2025(data: $data) {
+      sno
+      inst_code
+      institute_name
+      place
+      dist_code
+      co_education
+      college_type
+      year_of_estab
+      branch_code
+      branch_name
+      oc_boys
+      oc_girls
+      bc_a_boys
+      bc_a_girls
+      bc_b_boys
+      bc_b_girls
+      bc_c_boys
+      bc_c_girls
+      bc_d_boys
+      bc_d_girls
+      bc_e_boys
+      bc_e_girls
+      sc_boys
+      sc_girls
+      st_boys
+      st_girls
+      ews_gen_ou
+      ews_girls_ou
+      tuition_fee
+      affiliated_to
+    }
+  }
+`;
+
+export const UPDATE_TS_CUTOFF_2025 = gql`
+  mutation UpdateTsCutoff2025($sno: Float!, $data: TsCutoff2025Input!) {
+    updateTsCutoff2025(sno: $sno, data: $data) {
+      sno
+      inst_code
+      institute_name
+      place
+      dist_code
+      co_education
+      college_type
+      year_of_estab
+      branch_code
+      branch_name
+      oc_boys
+      oc_girls
+      bc_a_boys
+      bc_a_girls
+      bc_b_boys
+      bc_b_girls
+      bc_c_boys
+      bc_c_girls
+      bc_d_boys
+      bc_d_girls
+      bc_e_boys
+      bc_e_girls
+      sc_boys
+      sc_girls
+      st_boys
+      st_girls
+      ews_gen_ou
+      ews_girls_ou
+      tuition_fee
+      affiliated_to
+    }
+  }
+`;
+
+export const DELETE_TS_CUTOFF_2025 = gql`
+  mutation DeleteTsCutoff2025($sno: Float!) {
+    deleteTsCutoff2025(sno: $sno) {
+      sno
+    }
+  }
+`;
