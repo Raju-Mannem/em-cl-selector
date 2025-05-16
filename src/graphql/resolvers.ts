@@ -4,8 +4,8 @@ import { Decimal } from "@prisma/client/runtime/library";
 
 function toNumber(val: any): number | null {
   if (val === null || val === undefined) return null;
-  if (typeof val === 'number') return val;
-  if (typeof val === 'string') {
+  if (typeof val === "number") return val;
+  if (typeof val === "string") {
     const n = Number(val);
     return isNaN(n) ? null : n;
   }
@@ -92,14 +92,18 @@ const resolvers = {
         },
       });
     },
-    tsCutoff2025sByRank: async (__parent: any,args: { filter: any },context: Context) => {
-      
-      const { minRank, maxRank, branchCodes, casteColumns, distCodes } = args.filter;
+    tsCutoff2025sByRank: async (
+      __parent: any,
+      args: { filter: any },
+      context: Context
+    ) => {
+      const { minRank, maxRank, branchCodes, casteColumns, distCodes } =
+        args.filter;
 
       // 1. Fetch all rows for selected districts
       const rows = await context.prisma.ts_cutoff_2025.findMany({
         where: {
-          branch_code: {in: branchCodes},
+          branch_code: { in: branchCodes },
           dist_code: { in: distCodes },
         },
       });
@@ -111,26 +115,52 @@ const resolvers = {
       //   console.log("Min/Max rank:", minRank, maxRank);
       // }
 
-      // 2. Filter rows: at least one selected caste column is within [minRank, maxRank]
-      const filteredRows = rows.filter(row =>
-        casteColumns.some((col: any) => {
+      // 2. Filter rows: ALL selected caste columns must be within [minRank, maxRank]
+      const filteredRows = rows.filter((row) =>
+        casteColumns.every((col: any) => {
           const value = toNumber(row[col as keyof typeof row]);
           return value !== null && value >= minRank && value <= maxRank;
         })
       );
       // console.log('Filtered rows:', filteredRows.length);
 
-       // 3. Sort by the minimum rank among selected caste columns (ascending)
-       const sortedRows = filteredRows.slice().sort((a, b) => {
-        const aRanks = casteColumns.map((col:any) => toNumber(a[col as keyof typeof a])).filter((v:any) => v !== null) as number[];
-        const bRanks = casteColumns.map((col:any) => toNumber(b[col as keyof typeof b])).filter((v:any)=> v !== null) as number[];
-        const aMin = aRanks.length ? Math.min(...aRanks) : Infinity;
-        const bMin = bRanks.length ? Math.min(...bRanks) : Infinity;
-        return aMin - bMin;
-      });
+      // ⬇️ NEW GROUP + SORT LOGIC ⬇️
 
-      // 4. Map to result, returning only selected caste columns in 'dynamicCastes'
-      return sortedRows.map(row => ({
+      // Group by inst_code (college)
+      const groupedByCollege: Record<string, typeof filteredRows> = {};
+      for (const row of filteredRows) {
+        if (!groupedByCollege[row.inst_code!]) {
+          groupedByCollege[row.inst_code!] = [];
+        }
+        groupedByCollege[row.inst_code!].push(row);
+      }
+
+      // Sort college groups by minimum rank among their caste columns
+      const sortedCollegeGroups = Object.values(groupedByCollege).sort(
+        (groupA, groupB) => {
+          const minRankA = Math.min(
+            ...groupA.flatMap((row) =>
+              casteColumns
+                .map((col: any) => toNumber(row[col as keyof typeof row]))
+                .filter((v:any) => v !== null)
+            )
+          );
+          const minRankB = Math.min(
+            ...groupB.flatMap((row) =>
+              casteColumns
+                .map((col: any) => toNumber(row[col as keyof typeof row]))
+                .filter((v:any) => v !== null)
+            )
+          );
+          return minRankA - minRankB;
+        }
+      );
+
+      // Flatten to get final sorted rows
+      const sortedRows = sortedCollegeGroups.flat();
+
+      // 4. Map to result
+      return sortedRows.map((row) => ({
         sno: row.sno,
         inst_code: row.inst_code,
         institute_name: row.institute_name,
@@ -143,9 +173,13 @@ const resolvers = {
         ),
       }));
     },
-    tsCutoff2025sByInstDist: async (__parent: any, args: { filter: any }, context: Context) => {
+    tsCutoff2025sByInstDist: async (
+      __parent: any,
+      args: { filter: any },
+      context: Context
+    ) => {
       const { instCodes, branchCodes, casteColumns, distCodes } = args.filter;
-    
+
       const rows = await context.prisma.ts_cutoff_2025.findMany({
         where: {
           inst_code: { in: instCodes },
@@ -153,9 +187,9 @@ const resolvers = {
           branch_code: { in: branchCodes },
         },
       });
-    // console.log(rows);
+      // console.log(rows);
 
-      return rows.map(row => ({
+      return rows.map((row) => ({
         sno: row.sno,
         inst_code: row.inst_code,
         institute_name: row.institute_name,

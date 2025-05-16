@@ -145,6 +145,12 @@ export const GET_TS_CUTOFFS_2025_BY_RANK = gql`
     tsCutoff2025sByRank(filter: $filter) {
       sno
       inst_code
+      institute_name
+      branch_code
+      branch_name
+      dist_code
+      place
+      dynamicCastes
     }
   }
 `;

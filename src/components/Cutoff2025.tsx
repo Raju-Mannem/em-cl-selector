@@ -3,14 +3,14 @@ import React, { useState, useEffect } from "react";
 import { useLazyQuery } from "@apollo/client";
 import {
   GET_TS_CUTOFFS_2025_BY_RANK,
-  GET_TS_CUTOFFS_2025_BY_RANK_DIST,
+  // GET_TS_CUTOFFS_2025_BY_RANK_DIST,
 } from "../graphql/queries";
 import { districtOptions } from "../data/districts";
 import { casteOptions } from "../data/caste";
 import { branchOptions } from "../data/branch";
 import { jsPDF } from "jspdf";
-import {autoTable} from "jspdf-autotable";
-import { toast } from 'sonner'
+import { autoTable } from "jspdf-autotable";
+import { toast } from "sonner";
 
 interface TsCutoffData {
   __typename: string;
@@ -18,15 +18,15 @@ interface TsCutoffData {
   inst_code: string;
 }
 
-interface tsCutoff2025sPdfData{
-  sno: number,
-  inst_code: string,
-  institute_name: string,
-  branch_code: string,
-  branch_name: string,
-  dist_code: string,
-  distName: string,
-  place: string
+interface tsCutoff2025sPdfData {
+  sno: number;
+  inst_code: string;
+  institute_name: string;
+  branch_code: string;
+  branch_name: string;
+  dist_code: string;
+  distName: string;
+  place: string;
 }
 
 export interface CutoffRow {
@@ -48,7 +48,7 @@ const Cutoff2025 = () => {
   const [selectedCastes, setSelectedCastes] = useState<string[]>([]);
   const [selectedBranches, setSelectedBranches] = useState<string[]>([]);
   const [selectedDistricts, setSelectedDistricts] = useState<string[]>([]);
-  const [instCodes, setInstCodes] = useState<string[]>([]);
+  // const [instCodes, setInstCodes] = useState<string[]>([]);
   const [stdName, setStdName] = useState<string>("");
   const [stdRank, setStdRank] = useState<number>();
   const [stdCaste, setStdCaste] = useState<string>("");
@@ -58,100 +58,93 @@ const Cutoff2025 = () => {
     { errorPolicy: "all" }
   );
 
-  const [
-    fetchRowsByInstDistCodes,
-    { data: rowsData, loading: rowsLoading, error: rowsError },
-  ] = useLazyQuery(GET_TS_CUTOFFS_2025_BY_RANK_DIST, { errorPolicy: "all" });
+  // const [
+  //   fetchRowsByInstDistCodes,
+  //   { data: rowsData, loading: rowsLoading, error: rowsError },
+  // ] = useLazyQuery(GET_TS_CUTOFFS_2025_BY_RANK_DIST, { errorPolicy: "all" });
 
   const handlePDF = () => {
-    if(instCodes.length<=0){
-      toast.error("now data found");
-    }
-    else{
-    const doc = new jsPDF();
-    /** 
+    if (!stdName) {
+      toast.error("invalid details");
+    } else {
+      const doc = new jsPDF();
+      /** 
 	const imgURL = "/EAMCET INSTRUCTIONS_page-0001.jpg";
     doc.addImage(imgURL, "PNG", 5, 10, 200, 250);  
     
     doc.addPage("p");
     **/
-    doc.setFontSize(10);
-    doc.text(`Name: ${stdName}`, 14, 16);
-    doc.text(`Rank: ${stdRank} | Caste: ${stdCaste}`, 14, 22);
+      doc.setFontSize(10);
+      doc.text(
+        `Name: ${stdName} | Rank: ${stdRank} | Caste: ${stdCaste}`,
+        14,
+        16
+      );
 
-    const tableData = rowsData?.tsCutoff2025sByInstDist?.map((row:tsCutoff2025sPdfData, index:number) => [
-      index+1,
-      row.inst_code,
-      row.institute_name,
-      row.branch_code,
-      row.branch_name,
-      row.dist_code,
-      row.place,
-    ]);
+      const tableData = data?.tsCutoff2025sByRank?.map(
+        (row: tsCutoff2025sPdfData, index: number) => [
+          index + 1,
+          row.inst_code,
+          row.institute_name,
+          row.branch_code,
+          row.branch_name,
+          row.dist_code,
+          row.place,
+        ]
+      );
 
-    const tableColumn = [
-      "S.NO", "College Code", "College Name", "Branch Code", "Branch Name", " District Code",
-      "Place",
-    ];
-    autoTable(doc,{
-      head: [tableColumn],
-      body: tableData,
-      startY: 28, 
-      margin: { top: 10 },
-      styles: { fontSize: 4 },
-      columnStyles: {
-        2: { cellWidth: 'auto', halign: 'left' },
-        0: { halign: 'center' },
-        1: { halign: 'center' },
-        3: { halign: 'center' },
-        4: { halign: 'left' },
-        5: { halign: 'center' },
-        6: { halign: 'center' },
-        7: { halign: 'center' },
-        8: { halign: 'center' }, 
-        
-      },
-      theme: 'grid',
-    });
-  
-    doc.save(`${stdName}-ts-colleges-2025.pdf`);
-    toast.success(`pdf downloaded successfully`);
-  };
+      const tableColumn = [
+        "S.NO",
+        "College Code",
+        "College Name",
+        "Branch Code",
+        "Branch Name",
+        "District Code",
+        "Place",
+      ];
+      autoTable(doc, {
+        head: [tableColumn],
+        body: tableData,
+        startY: 28,
+        margin: { top: 10 },
+        styles: { fontSize: 6 },
+        // headStyles: { halign: "center" },
+        columnStyles: {
+          2: { cellWidth: "auto", halign: "left" },
+          0: { halign: "center" },
+          1: { halign: "center" },
+          3: { halign: "center" },
+          4: { halign: "left" },
+          5: { halign: "center" },
+          6: { halign: "center" },
+          // 7: { halign: 'center' },
+          // 8: { halign: 'center' },
+        },
+        theme: "grid",
+        // didParseCell: function (data) {
+        //   if (data.section === 'head') {
+        //     if (data.column.index === 2 || data.column.index === 4) {
+        //       data.cell.styles.halign = 'left';
+        //     } else {
+        //       data.cell.styles.halign = 'center';
+        //     }
+        //   }
+        // }
+      });
+
+      doc.save(`${stdName}-${stdRank}-${stdCaste}.pdf`);
+      toast.success(`pdf downloaded successfully`);
+    }
   };
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if(minRank>=maxRank || Number(minRank)<0){
-    toast.error(`Invalid details, Please check those`);
-    }
-    else{
-    const variables = {
-      filter: {
-        minRank: Number(minRank),
-        maxRank: Number(maxRank),
-        casteColumns: selectedCastes,
-        branchCodes: selectedBranches,
-        distCodes: selectedDistricts,
-      },
-    };
-    
-    console.log("Submitting filter:", variables);
-    fetchCutoffs({ variables });
-  };
-};
-
-  useEffect(() => {
-    if (data && data.tsCutoff2025sByRank.length) {
-      const uniqueInstCodes = data.tsCutoff2025sByRank
-        .map((item: TsCutoffData) => item.inst_code)
-        .filter(
-          (value: TsCutoffData, index: number, self: TsCutoffData[]) =>
-            self.indexOf(value) === index
-        );
-
-      setInstCodes(uniqueInstCodes);
+    if (Number(minRank) >= Number(maxRank) || Number(minRank) < 0) {
+      toast.error(`Invalid details, Please check details`);
+    } else {
       const variables = {
         filter: {
-          instCodes: uniqueInstCodes,
+          minRank: Number(minRank),
+          maxRank: Number(maxRank),
           casteColumns: selectedCastes,
           branchCodes: selectedBranches,
           distCodes: selectedDistricts,
@@ -159,10 +152,34 @@ const Cutoff2025 = () => {
       };
 
       console.log("Submitting filter:", variables);
-
-      fetchRowsByInstDistCodes({ variables });
+      fetchCutoffs({ variables });
     }
-  }, [data, fetchRowsByInstDistCodes]);
+  };
+
+  // useEffect(() => {
+  //   if (data && data.tsCutoff2025sByRank.length) {
+  //     const uniqueInstCodes = data.tsCutoff2025sByRank
+  //       .map((item: TsCutoffData) => item.inst_code)
+  //       .filter(
+  //         (value: TsCutoffData, index: number, self: TsCutoffData[]) =>
+  //           self.indexOf(value) === index
+  //       );
+
+  //     setInstCodes(uniqueInstCodes);
+  //     const variables = {
+  //       filter: {
+  //         instCodes: uniqueInstCodes,
+  //         casteColumns: selectedCastes,
+  //         branchCodes: selectedBranches,
+  //         distCodes: selectedDistricts,
+  //       },
+  //     };
+
+  //     console.log("Submitting filter:", variables);
+
+  //     fetchRowsByInstDistCodes({ variables });
+  //   }
+  // }, [data, fetchRowsByInstDistCodes]);
 
   return (
     <section className="flex justify-center items-center flex-col overflow-x-auto py-2 sm:py-4 sm:px-8 text-[6px] sm:text-[12px] font-sans">
@@ -173,33 +190,33 @@ const Cutoff2025 = () => {
         >
           <div className="basis-2/12 flex gap-2">
             <div>
-            <label className="block text-gray-700 font-medium mb-1">
-              Minimum Rank
-            </label>
-            <input
-              type="number"
-              className="px-1 sm:px-3 py-1 sm:py-2 border border-indigo-100 bg-indigo-50 rounded focus:outline-none focus:ring-2 focus:ring-indigo-400"
-              placeholder="minimum rank"
-              value={minRank}
-              onChange={(e) => setMinRank(e.target.value)}
-              required
-              min={0}
-            />
+              <label className="block text-gray-700 font-medium mb-1">
+                Minimum Rank
+              </label>
+              <input
+                type="number"
+                className="px-1 sm:px-3 py-1 sm:py-2 border border-indigo-100 bg-indigo-50 rounded focus:outline-none focus:ring-2 focus:ring-indigo-400"
+                placeholder="minimum rank"
+                value={minRank}
+                onChange={(e) => setMinRank(e.target.value)}
+                required
+                min={0}
+              />
             </div>
-          <div>
-            <label className="block text-gray-700 font-medium mb-1">
-              Maximum Rank
-            </label>
-            <input
-              type="number"
-              className="px-1 sm:px-3 py-1 sm:py-2 border border-indigo-100 bg-indigo-50 rounded focus:outline-none focus:ring-2 focus:ring-indigo-400"
-              placeholder="maximum rank"
-              value={maxRank}
-              onChange={(e) => setMaxRank(e.target.value)}
-              required
-              min={0}
-            />
-          </div>
+            <div>
+              <label className="block text-gray-700 font-medium mb-1">
+                Maximum Rank
+              </label>
+              <input
+                type="number"
+                className="px-1 sm:px-3 py-1 sm:py-2 border border-indigo-100 bg-indigo-50 rounded focus:outline-none focus:ring-2 focus:ring-indigo-400"
+                placeholder="maximum rank"
+                value={maxRank}
+                onChange={(e) => setMaxRank(e.target.value)}
+                required
+                min={0}
+              />
+            </div>
           </div>
           <div className="basis-2/12 mt-2 sm:mt-6">
             <details className="group relative overflow-hidden rounded border border-gray-300 shadow-sm bg-indigo-50">
@@ -246,31 +263,32 @@ const Cutoff2025 = () => {
                   <legend className="sr-only">Checkboxes</legend>
 
                   <div className="flex flex-col items-start gap-3 max-h-24 overflow-y-auto pr-2">
-                  <label
+                    <label
                       htmlFor="all"
                       className="inline-flex items-center gap-2 sm:gap-3"
                     >
                       <input
                         type="checkbox"
                         className="size-2 sm:size-5 rounded border-gray-300 shadow-sm"
-                        checked={selectedBranches.length === branchOptions.length} 
-                        onChange={() => 
-                        {
-                          if (selectedBranches.length === branchOptions.length) {
+                        checked={
+                          selectedBranches.length === branchOptions.length
+                        }
+                        onChange={() => {
+                          if (
+                            selectedBranches.length === branchOptions.length
+                          ) {
                             // Deselect all
                             setSelectedBranches([]);
                           } else {
                             // Select all
-                            setSelectedBranches(branchOptions.map(opt => opt.value));
+                            setSelectedBranches(
+                              branchOptions.map((opt) => opt.value)
+                            );
                           }
-                        }
-                        }
+                        }}
                       />
 
-                      <span className="font-medium text-gray-700">
-                        {" "}
-                        All{" "}
-                      </span>
+                      <span className="font-medium text-gray-700"> All </span>
                     </label>
 
                     {branchOptions.map((opt) => (
@@ -350,31 +368,28 @@ const Cutoff2025 = () => {
                   <legend className="sr-only">Checkboxes</legend>
 
                   <div className="flex flex-col items-start gap-3 max-h-24 overflow-y-auto pr-2">
-                  <label
+                    <label
                       htmlFor="all"
                       className="inline-flex items-center gap-2 sm:gap-3"
                     >
                       <input
                         type="checkbox"
                         className="size-2 sm:size-5 rounded border-gray-300 shadow-sm"
-                        checked={selectedCastes.length === casteOptions.length} 
-                        onChange={() => 
-                        {
+                        checked={selectedCastes.length === casteOptions.length}
+                        onChange={() => {
                           if (selectedCastes.length === casteOptions.length) {
                             // Deselect all
                             setSelectedCastes([]);
                           } else {
                             // Select all
-                            setSelectedCastes(casteOptions.map(opt => opt.value));
+                            setSelectedCastes(
+                              casteOptions.map((opt) => opt.value)
+                            );
                           }
-                        }
-                        }
+                        }}
                       />
 
-                      <span className="font-medium text-gray-700">
-                        {" "}
-                        All{" "}
-                      </span>
+                      <span className="font-medium text-gray-700"> All </span>
                     </label>
 
                     {casteOptions.map((opt) => (
@@ -460,24 +475,25 @@ const Cutoff2025 = () => {
                       <input
                         type="checkbox"
                         className="size-2 sm:size-5 rounded border-gray-300 shadow-sm"
-                        checked={selectedDistricts.length === districtOptions.length} 
-                        onChange={() => 
-                        {
-                          if (selectedDistricts.length === districtOptions.length) {
+                        checked={
+                          selectedDistricts.length === districtOptions.length
+                        }
+                        onChange={() => {
+                          if (
+                            selectedDistricts.length === districtOptions.length
+                          ) {
                             // Deselect all
                             setSelectedDistricts([]);
                           } else {
                             // Select all
-                            setSelectedDistricts(districtOptions.map(opt => opt.value));
+                            setSelectedDistricts(
+                              districtOptions.map((opt) => opt.value)
+                            );
                           }
-                        }
-                        }
+                        }}
                       />
 
-                      <span className="font-medium text-gray-700">
-                        {" "}
-                        All{" "}
-                      </span>
+                      <span className="font-medium text-gray-700"> All </span>
                     </label>
 
                     {districtOptions.map((opt) => (
@@ -523,8 +539,8 @@ const Cutoff2025 = () => {
         </form>
       </article>
       <article className="w-full h-full mt-20">
-      <div className="mt-8 flex gap-4 ">
-        <span>
+        <div className="mt-8 flex gap-4 ">
+          <span>
             <label className="block text-gray-700 font-medium mb-1">
               Student Name
             </label>
@@ -537,8 +553,8 @@ const Cutoff2025 = () => {
               required
               min={0}
             />
-            </span>
-            <span>
+          </span>
+          <span>
             <label className="block text-gray-700 font-medium mb-1">
               Student Rank
             </label>
@@ -550,12 +566,12 @@ const Cutoff2025 = () => {
               onChange={(e) => setStdRank(Number(e.target.value))}
               required
             />
-            </span>
-            <span>
+          </span>
+          <span>
             <label className="block text-gray-700 font-medium mb-1">
               Student Caste
             </label>
-             <input
+            <input
               type="text"
               className="px-1 sm:px-3 py-1 sm:py-2 border border-indigo-100 bg-indigo-50 rounded focus:outline-none focus:ring-2 focus:ring-indigo-400"
               placeholder="caste"
@@ -564,20 +580,20 @@ const Cutoff2025 = () => {
               required
               min={0}
             />
-            </span>
-            <span>
+          </span>
+          <span>
             <button
-            type="submit"
-            className="justify-self-end basis-1/12 sm:ml-4 mt-2 sm:mt-6 bg-emerald-700 px-4 py-2 font-semibold text-white rounded hover:bg-indigo-700 transition"
-            onClick={()=>handlePDF()}
-          >
-            print
-          </button>
-            </span>
-            </div>
+              type="submit"
+              className="justify-self-end basis-1/12 sm:ml-4 mt-2 sm:mt-6 bg-emerald-700 px-4 py-2 font-semibold text-white rounded hover:bg-indigo-700 transition"
+              onClick={() => handlePDF()}
+            >
+              print
+            </button>
+          </span>
+        </div>
         <div className="mt-8">
           {loading && (
-            <div className="text-indigo-500 text-center">
+            <div className="flex justify-center align-center gap-2 text-indigo-500 text-center">
               <span>
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -594,10 +610,12 @@ const Cutoff2025 = () => {
                   />
                 </svg>
               </span>
-              <strong className="text-2xl font-sans">
-                {" "}
-                Loading............
-              </strong>
+              <span>
+                <strong className="text-2xl font-sans">
+                  {" "}
+                  Loading............
+                </strong>
+              </span>
             </div>
           )}
           {error && (
@@ -609,20 +627,20 @@ const Cutoff2025 = () => {
               {JSON.stringify(error)}
             </div>
           )}
-          {rowsLoading && (
+          {/* {rowsLoading && (
             <div className="text-indigo-500 flex justify-center items-center">Loading Rows...</div>
-          )}
-          {rowsError && (
+          )} */}
+          {/* {rowsError && (
             <div className="text-red-500 text-center">
               Error: {rowsError.message}
             </div>
-          )}
-          {rowsData?.tsCutoff2025sByInstDist?.length === 0 && (
+          )} */}
+          {data?.tsCutoff2025sByRankt?.length === 0 && (
             <div className="text-gray-500 text-center">
               No rows found for the selected institute codes.
             </div>
           )}
-          {rowsData?.tsCutoff2025sByInstDist?.length > 0 ? (
+          {data?.tsCutoff2025sByRank?.length > 0 ? (
             <div className="overflow-x-auto mt-6">
               <table className="min-w-full table-auto bg-white border border-collapse text-[4px] sm:text-[10px] font-sans">
                 <thead className="bg-emerald-700 text-neutral-100 font-extrabold">
@@ -659,7 +677,7 @@ const Cutoff2025 = () => {
                   </tr>
                 </thead>
                 <tbody className="text-neutral-900">
-                  {rowsData.tsCutoff2025sByInstDist.map(
+                  {data.tsCutoff2025sByRank.map(
                     (row: CutoffRow, index: number) => (
                       <tr
                         key={row.sno}
