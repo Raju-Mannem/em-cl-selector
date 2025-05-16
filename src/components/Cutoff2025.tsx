@@ -138,7 +138,7 @@ const Cutoff2025 = () => {
   };
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (Number(minRank) >= Number(maxRank) || Number(minRank) < 0) {
+    if (Number(minRank) >= Number(maxRank) || Number(minRank) < 0 || selectedCastes.length<1 ||  selectedBranches.length<1 || selectedDistricts.length<1) {
       toast.error(`Invalid details, Please check details`);
     } else {
       const variables = {
@@ -635,8 +635,8 @@ const Cutoff2025 = () => {
               Error: {rowsError.message}
             </div>
           )} */}
-          {data?.tsCutoff2025sByRankt?.length === 0 && (
-            <div className="text-gray-500 text-center">
+          {data?.tsCutoff2025sByRank?.length === 0 && (
+            <div className="text-red-500 text-center py-12 border-t text-sm">
               No rows found for the selected institute codes.
             </div>
           )}
