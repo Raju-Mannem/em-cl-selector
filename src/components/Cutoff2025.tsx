@@ -75,9 +75,9 @@ const Cutoff2025 = () => {
     
     doc.addPage("p");
     **/
+    doc.setFontSize(10);
     doc.text(`Name: ${stdName}`, 14, 16);
     doc.text(`Rank: ${stdRank} | Caste: ${stdCaste}`, 14, 22);
-    doc.text(`Caste: ${stdCaste}`, 14, 28);
 
     const tableData = rowsData?.tsCutoff2025sByInstDist?.map((row:tsCutoff2025sPdfData, index:number) => [
       index+1,
