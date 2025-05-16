@@ -96,6 +96,7 @@ const Cutoff2025 = () => {
     autoTable(doc,{
       head: [tableColumn],
       body: tableData,
+      startY: 28, 
       margin: { top: 10 },
       styles: { fontSize: 4 },
       columnStyles: {
