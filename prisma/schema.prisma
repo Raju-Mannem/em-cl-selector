@@ -49,4 +49,5 @@ model ts_cutoff_2025 {
   ews_girls_ou   Decimal? @db.Decimal
   tuition_fee    Decimal? @db.Decimal
   affiliated_to  String?
+  priority       Int?
 }

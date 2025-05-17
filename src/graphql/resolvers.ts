@@ -124,40 +124,10 @@ const resolvers = {
       );
       // console.log('Filtered rows:', filteredRows.length);
 
-      // ⬇️ NEW GROUP + SORT LOGIC ⬇️
-
-      // Group by inst_code (college)
-      const groupedByCollege: Record<string, typeof filteredRows> = {};
-      for (const row of filteredRows) {
-        if (!groupedByCollege[row.inst_code!]) {
-          groupedByCollege[row.inst_code!] = [];
-        }
-        groupedByCollege[row.inst_code!].push(row);
-      }
-
-      // Sort college groups by minimum rank among their caste columns
-      const sortedCollegeGroups = Object.values(groupedByCollege).sort(
-        (groupA, groupB) => {
-          const minRankA = Math.min(
-            ...groupA.flatMap((row) =>
-              casteColumns
-                .map((col: any) => toNumber(row[col as keyof typeof row]))
-                .filter((v:any) => v !== null)
-            )
-          );
-          const minRankB = Math.min(
-            ...groupB.flatMap((row) =>
-              casteColumns
-                .map((col: any) => toNumber(row[col as keyof typeof row]))
-                .filter((v:any) => v !== null)
-            )
-          );
-          return minRankA - minRankB;
-        }
+      // ✅ 3. Sort the filtered rows by priority (ascending)
+      const sortedRows = filteredRows.sort(
+        (a, b) => toNumber(a.priority)! - toNumber(b.priority)!
       );
-
-      // Flatten to get final sorted rows
-      const sortedRows = sortedCollegeGroups.flat();
 
       // 4. Map to result
       return sortedRows.map((row) => ({
@@ -168,6 +138,7 @@ const resolvers = {
         dist_code: row.dist_code,
         branch_code: row.branch_code,
         branch_name: row.branch_name,
+        co_education: row.co_education,
         dynamicCastes: Object.fromEntries(
           casteColumns.map((col: any) => [col, row[col as keyof typeof row]])
         ),
@@ -197,6 +168,7 @@ const resolvers = {
         dist_code: row.dist_code,
         branch_code: row.branch_code,
         branch_name: row.branch_name,
+        co_education: row.co_education,
         dynamicCastes: Object.fromEntries(
           casteColumns.map((col: String) => [col, row[col as keyof typeof row]])
         ),

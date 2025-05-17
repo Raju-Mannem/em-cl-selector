@@ -151,6 +151,7 @@ export const GET_TS_CUTOFFS_2025_BY_RANK = gql`
       dist_code
       place
       dynamicCastes
+      co_education
     }
   }
 `;

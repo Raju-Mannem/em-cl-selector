@@ -40,6 +40,7 @@ const typeDefs = `#graphql
     ews_girls_ou: Int
     tuition_fee: Int
     affiliated_to: String
+    priority: Int
   }
 
 input TsCutoff2025Input {
@@ -73,6 +74,7 @@ ews_gen_ou: Int
 ews_girls_ou: Int
 tuition_fee: Int
 affiliated_to: String
+priority: Int
 }
 
   input RankFilterInput {
@@ -98,6 +100,7 @@ affiliated_to: String
     dist_code: String
     branch_name: String
     branch_code: String
+    co_education: String
     dynamicCastes: JSON
   }
 
