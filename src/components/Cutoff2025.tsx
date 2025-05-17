@@ -27,6 +27,7 @@ interface tsCutoff2025sPdfData {
   dist_code: string;
   distName: string;
   place: string;
+  co_education: string;
 }
 
 export interface CutoffRow {
@@ -37,6 +38,7 @@ export interface CutoffRow {
   branch_name: string;
   dist_code: string;
   place: string;
+  co_education: string;
   dynamicCastes?: {
     [key: string]: number | null;
   };
@@ -50,7 +52,7 @@ const Cutoff2025 = () => {
   const [selectedDistricts, setSelectedDistricts] = useState<string[]>([]);
   // const [instCodes, setInstCodes] = useState<string[]>([]);
   const [stdName, setStdName] = useState<string>("");
-  const [stdRank, setStdRank] = useState<number>();
+  const [stdRank, setStdRank] = useState<string>("");
   const [stdCaste, setStdCaste] = useState<string>("");
 
   const [fetchCutoffs, { data, loading, error }] = useLazyQuery(
@@ -74,41 +76,81 @@ const Cutoff2025 = () => {
     
     doc.addPage("p");
     **/
-      doc.setFontSize(10);
-      doc.text(
-        `Name: ${stdName} | Rank: ${stdRank} | Caste: ${stdCaste}`,
-        14,
-        16
-      );
+
+      // doc.text(
+      //   `Name: ${stdName} | Rank: ${stdRank} | Caste: ${stdCaste}`,
+      //   14,
+      //   16
+      // );
 
       const tableData = data?.tsCutoff2025sByRank?.map(
-        (row: tsCutoff2025sPdfData, index: number) => [
-          index + 1,
-          row.inst_code,
-          row.institute_name,
-          row.branch_code,
-          row.branch_name,
-          row.dist_code,
-          row.place,
-        ]
+        (row: tsCutoff2025sPdfData, index: number) => ({
+          sno: index + 1,
+          inst_code: row.inst_code,
+          institute_name: row.institute_name,
+          branch_code: row.branch_code,
+          branch_name: row.branch_name,
+          dist_code: row.dist_code,
+          place: row.place,
+          co_education: row.co_education, // keep for logic, not display
+        })
       );
 
-      const tableColumn = [
-        "S.NO",
-        "College Code",
-        "College Name",
-        "Branch Code",
-        "Branch Name",
-        "District Code",
-        "Place",
+      const firstTableColumn = [
+        `Name: ${stdName} `,
+        `Rank: ${stdRank} `,
+        `Caste: ${stdCaste} `,
       ];
+
+      const tableColumn = [
+        { header: "S.NO", dataKey: "sno" },
+        { header: "College Code", dataKey: "inst_code" },
+        { header: "College Name", dataKey: "institute_name" },
+        { header: "Branch Code", dataKey: "branch_code" },
+        { header: "Branch Name", dataKey: "branch_name" },
+        { header: "District Code", dataKey: "dist_code" },
+        { header: "Place", dataKey: "place" },
+        // Do NOT include co_education column!
+      ];
+
       autoTable(doc, {
-        head: [tableColumn],
-        body: tableData,
-        startY: 28,
+        head: [firstTableColumn],
+        startY: 14,
         margin: { top: 10 },
-        styles: { fontSize: 6 },
-        // headStyles: { halign: "center" },
+        styles: {
+          fontSize: 9,
+          cellPadding: 4,
+          font: "helvetica",
+          // textColor: [40, 40, 40],
+          // lineColor: [44, 62, 80],
+          // lineWidth: 0.2,
+          valign: "middle",
+          halign: "center",
+        },
+        headStyles: {
+          fillColor: [236, 250, 229], // light green header background
+          textColor: [16, 46, 80], // Navy blue header text
+          fontStyle: "bold",
+          halign: "center",
+        },
+        columnStyles: {
+          0: { halign: "center", fontStyle: "bold" }, // Example: first column centered and bold
+          1: { halign: "center" },
+        },
+        theme: "plain", // Use 'plain' to avoid built-in styling interference
+      });
+
+      autoTable(doc, {
+        columns: tableColumn,
+        body: tableData,
+        startY: 34,
+        margin: { top: 10, bottom: 10  },
+        styles: {
+          fontSize: 9,
+          cellPadding: 2,
+          minCellHeight: 14,
+          valign: "middle",
+        },
         columnStyles: {
           2: { cellWidth: "auto", halign: "left" },
           0: { halign: "center" },
@@ -117,19 +159,21 @@ const Cutoff2025 = () => {
           4: { halign: "left" },
           5: { halign: "center" },
           6: { halign: "center" },
-          // 7: { halign: 'center' },
-          // 8: { halign: 'center' },
         },
         theme: "grid",
-        // didParseCell: function (data) {
-        //   if (data.section === 'head') {
-        //     if (data.column.index === 2 || data.column.index === 4) {
-        //       data.cell.styles.halign = 'left';
-        //     } else {
-        //       data.cell.styles.halign = 'center';
-        //     }
-        //   }
-        // }
+        didParseCell: function (data) {
+          if (data.section === "body") {
+            const raw = data.row.raw;
+            if (
+              typeof raw === "object" &&
+              raw !== null &&
+              "co_education" in raw &&
+              (raw as any).co_education === "GIRLS"
+            ) {
+              data.cell.styles.textColor = [233, 30, 99]; // Pink
+            }
+          }
+        },
       });
 
       doc.save(`${stdName}-${stdRank}-${stdCaste}.pdf`);
@@ -138,7 +182,13 @@ const Cutoff2025 = () => {
   };
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (Number(minRank) >= Number(maxRank) || Number(minRank) < 0 || selectedCastes.length<1 ||  selectedBranches.length<1 || selectedDistricts.length<1) {
+    if (
+      Number(minRank) >= Number(maxRank) ||
+      Number(minRank) < 0 ||
+      selectedCastes.length < 1 ||
+      selectedBranches.length < 1 ||
+      selectedDistricts.length < 1
+    ) {
       toast.error(`Invalid details, Please check details`);
     } else {
       const variables = {
@@ -563,7 +613,7 @@ const Cutoff2025 = () => {
               className="px-1 sm:px-3 py-1 sm:py-2 border border-indigo-100 bg-indigo-50 rounded focus:outline-none focus:ring-2 focus:ring-indigo-400"
               placeholder="rank"
               value={stdRank}
-              onChange={(e) => setStdRank(Number(e.target.value))}
+              onChange={(e) => setStdRank(e.target.value)}
               required
             />
           </span>
@@ -681,7 +731,9 @@ const Cutoff2025 = () => {
                     (row: CutoffRow, index: number) => (
                       <tr
                         key={row.sno}
-                        className={`hover:bg-stone-50 hover:text-blue-500 h-4 ${
+                        className={`hover:bg-stone-50 ${
+                          row.co_education == "GIRLS" && "text-red-400"
+                        } hover:text-blue-500 h-4 ${
                           index % 2 != 0 ? "bg-gray-100" : ""
                         }`}
                       >
