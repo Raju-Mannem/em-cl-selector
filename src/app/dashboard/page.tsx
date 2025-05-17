@@ -24,7 +24,7 @@ const Dashboard = () => {
             onClick={() => handleSelect("cutoff")}
             className="focus:outline-0"
           >
-            Cutoff 2025
+            Cutoff 2024
           </button>
         </article>
       </section>
