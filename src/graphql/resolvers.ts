@@ -2,14 +2,34 @@ import { Context } from "../pages/api/graphql";
 import { GraphQLScalarType, Kind } from "graphql";
 import { Decimal } from "@prisma/client/runtime/library";
 
-function toNumber(val: any): number | null {
+function toNumber(
+  val: Decimal | number | string | null | undefined
+): number | null {
   if (val === null || val === undefined) return null;
-  if (typeof val === "number") return val;
-  if (typeof val === "string") {
-    const n = Number(val);
-    return isNaN(n) ? null : n;
+  // If already a number, return as is
+  if (typeof val === "number") {
+    return isFinite(val) ? val : null;
   }
-  if (val instanceof Decimal) return val.toNumber();
+  // If Prisma.Decimal, use its toNumber method
+  if (
+    typeof val === "object" &&
+    val !== null &&
+    "toNumber" in val &&
+    typeof (val as any).toNumber === "function"
+  ) {
+    try {
+      const num = (val as Decimal).toNumber();
+      return isFinite(num) ? num : null;
+    } catch {
+      return null;
+    }
+  }
+  // If a string, attempt to parse as number
+  if (typeof val === "string") {
+    const num = Number(val);
+    return isFinite(num) ? num : null;
+  }
+  // Fallback: not a valid number
   return null;
 }
 
@@ -106,6 +126,9 @@ const resolvers = {
           branch_code: { in: branchCodes },
           dist_code: { in: distCodes },
         },
+        orderBy: {
+          priority: "asc",
+        },
       });
 
       // console.log("Rows from DB:", rows.length);
@@ -118,16 +141,29 @@ const resolvers = {
       // 2. Filter rows: ALL selected caste columns must be within [minRank, maxRank]
       const filteredRows = rows.filter((row) =>
         casteColumns.every((col: any) => {
-          const value = toNumber(row[col as keyof typeof row]);
+          const value = toNumber(row[col as keyof typeof row]) ?? 0;
           return value !== null && value >= minRank && value <= maxRank;
         })
       );
       // console.log('Filtered rows:', filteredRows.length);
 
-      // ✅ 3. Sort the filtered rows by priority (ascending)
-      const sortedRows = filteredRows.sort(
-        (a, b) => toNumber(a.priority)! - toNumber(b.priority)!
+      // ✅ 3. Create a branch code order map for fast lookup
+      const branchOrderMap = new Map<string, number>(
+        branchCodes.map((code: string, index: number) => [code, index])
       );
+
+      const sortedRows = filteredRows.sort((a, b) => {
+        // priority is Int? (number | null)
+        const priorityA = a.priority ?? 0;
+        const priorityB = b.priority ?? 0;
+        const priorityDiff = priorityA - priorityB;
+        if (priorityDiff !== 0) return priorityDiff;
+        const branchAOrder =
+          branchOrderMap.get(a.branch_code ?? "") ?? Number.MAX_SAFE_INTEGER;
+        const branchBOrder =
+          branchOrderMap.get(b.branch_code ?? "") ?? Number.MAX_SAFE_INTEGER;
+        return branchAOrder - branchBOrder;
+      });
 
       // 4. Map to result
       return sortedRows.map((row) => ({
