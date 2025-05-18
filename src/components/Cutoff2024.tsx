@@ -200,6 +200,7 @@ const Cutoff2024 = () => {
           casteColumns: selectedCastes,
           branchCodes: selectedBranches,
           distCodes: selectedDistricts,
+          coEdu: coEdu,
         },
       };
 
