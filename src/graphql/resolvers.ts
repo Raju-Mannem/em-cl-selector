@@ -141,8 +141,10 @@ const resolvers = {
       // 2. Filter rows: ALL selected caste columns must be within [minRank, maxRank]
       const filteredRows = rows.filter((row) =>
         casteColumns.every((col: any) => {
-          const value = toNumber(row[col as keyof typeof row]) ?? 0;
-          return value !== null && value >= minRank && value <= maxRank;
+          const rawValue = row[col as keyof typeof row];
+          if (rawValue === null || rawValue === undefined) return false;
+          const value = toNumber(rawValue);
+          return value! >= minRank && value! <= maxRank;
         })
       );
       // console.log('Filtered rows:', filteredRows.length);
@@ -166,7 +168,7 @@ const resolvers = {
       });
 
       // 4. Map to result
-      return sortedRows.map((row) => ({
+      return filteredRows.map((row) => ({
         sno: row.sno,
         inst_code: row.inst_code,
         institute_name: row.institute_name,
