@@ -117,15 +117,18 @@ const resolvers = {
       args: { filter: any },
       context: Context
     ) => {
-      const { minRank, maxRank, branchCodes, casteColumns, distCodes } =
+      const { minRank, maxRank, branchCodes, casteColumns, distCodes, coEdu } =
         args.filter;
+
+        const whereClause: any = {
+          branch_code: { in: branchCodes },
+          dist_code: { in: distCodes },
+          ...(coEdu && { co_education: "GIRLS" }),
+        };
 
       // 1. Fetch all rows for selected districts
       const rows = await context.prisma.ts_cutoff_2024.findMany({
-        where: {
-          branch_code: { in: branchCodes },
-          dist_code: { in: distCodes },
-        },
+        where: whereClause,
         orderBy: {
           priority: "asc",
         },

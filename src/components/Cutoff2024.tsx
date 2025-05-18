@@ -54,6 +54,8 @@ const Cutoff2024 = () => {
   const [stdName, setStdName] = useState<string>("");
   const [stdRank, setStdRank] = useState<string>("");
   const [stdCaste, setStdCaste] = useState<string>("");
+  const [coEdu, setCoEdu] = useState<boolean>(false);
+  const [result, setResult] = useState<CutoffRow[]>([]);
 
   const [fetchCutoffs, { data, loading, error }] = useLazyQuery(
     GET_TS_CUTOFFS_2024_BY_RANK,
@@ -83,8 +85,8 @@ const Cutoff2024 = () => {
       //   16
       // );
 
-      const tableData = data?.tsCutoff2024sByRank?.map(
-        (row: tsCutoff2024sPdfData, index: number) => ({
+      const tableData = result?.map(
+        (row: CutoffRow, index: number) => ({
           sno: index + 1,
           inst_code: row.inst_code,
           institute_name: row.institute_name,
@@ -201,9 +203,20 @@ const Cutoff2024 = () => {
         },
       };
 
-      console.log("Submitting filter:", variables);
+      // console.log("Submitting filter:", variables);
       fetchCutoffs({ variables });
     }
+  };
+
+  
+  useEffect(() => {
+    if (data?.tsCutoff2024sByRank) {
+      setResult(data.tsCutoff2024sByRank);
+    }
+  }, [data]);
+
+  const handleDelete = (sno: number) => {
+    setResult(prevItems => prevItems.filter(item => item.sno !== sno));
   };
 
   // useEffect(() => {
@@ -580,6 +593,61 @@ const Cutoff2024 = () => {
               </div>
             </details>
           </div>
+          <div className="basis-2/12 mt-2 sm:mt-6">
+            <details className="group relative overflow-hidden rounded border border-gray-300 shadow-sm bg-indigo-50">
+              <summary className="flex items-center justify-between gap-2 p-2 sm:p-3 text-gray-700 transition-colors hover:text-gray-900 [&::-webkit-details-marker]:hidden">
+                <span className="font-medium"> Co-Education </span>
+                <span className="transition-transform group-open:-rotate-180">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    strokeWidth="1.5"
+                    stroke="currentColor"
+                    className="size-2 sm:size-4"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M19.5 8.25l-7.5 7.5-7.5-7.5"
+                    />
+                  </svg>
+                </span>
+              </summary>
+              <div className="divide-y divide-gray-300 border-t border-gray-300 bg-white">
+                <div className="flex items-center justify-between px-3 py-2">
+                  <span className="text-gray-700"> {coEdu ? 1 : 0} </span>
+                  <button
+                    type="button"
+                    className="text-gray-700 underline transition-colors hover:text-gray-900"
+                    onClick={() => {
+                      setCoEdu(false);
+                    }}
+                  >
+                    Reset
+                  </button>
+                </div>
+                <fieldset className="p-3">
+                  <legend className="sr-only">Checkboxes</legend>
+                  <div className="flex flex-col items-start gap-3 max-h-24 overflow-y-auto pr-2">
+                    <label
+                      htmlFor="Option"
+                      key="girls"
+                      className="inline-flex items-center gap-2 sm:gap-3"
+                    >
+                      <input
+                        type="checkbox"
+                        className="size-2 sm:size-5 rounded border-gray-300 shadow-sm"
+                        checked={coEdu}
+                        onChange={(e) => setCoEdu(e.target.checked)}
+                      />
+                      <span className="font-medium text-gray-700"> Girls</span>
+                    </label>
+                  </div>
+                </fieldset>
+              </div>
+            </details>
+          </div>
           <button
             type="submit"
             className="justify-self-end basis-1/12 sm:ml-4 mt-2 sm:mt-6 bg-indigo-600 text-white font-semibold py-2 px-4 rounded hover:bg-indigo-700 transition"
@@ -690,7 +758,7 @@ const Cutoff2024 = () => {
               No rows found for the selected institute codes.
             </div>
           )}
-          {data?.tsCutoff2024sByRank?.length > 0 ? (
+          {result?.length > 0 ? (
             <div className="overflow-x-auto mt-6">
               <table className="min-w-full table-auto bg-white border border-collapse text-[4px] sm:text-[10px] font-sans">
                 <thead className="bg-emerald-700 text-neutral-100 font-extrabold">
@@ -727,7 +795,7 @@ const Cutoff2024 = () => {
                   </tr>
                 </thead>
                 <tbody className="text-neutral-900">
-                  {data.tsCutoff2024sByRank.map(
+                  {result.map(
                     (row: CutoffRow, index: number) => (
                       <tr
                         key={row.sno}
@@ -737,8 +805,24 @@ const Cutoff2024 = () => {
                           index % 2 != 0 ? "bg-gray-100" : ""
                         }`}
                       >
-                        <td className="border border-gray-300 py-2 text-center max-w-min">
-                          {index + 1}
+                         <td className="border border-gray-300 py-2 text-center max-w-min">
+                          <button className="flex justify-center items-center gap-1 w-full h-full" onClick={()=>handleDelete(row.sno)}>
+                            {index + 1}
+                            <svg
+                              xmlns="http://www.w3.org/2000/svg"
+                              fill="none"
+                              viewBox="0 0 24 24"
+                              strokeWidth={1.5}
+                              stroke="currentColor"
+                              className="size-1 sm:size-3"
+                            >
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0"
+                              />
+                            </svg>
+                          </button>
                         </td>
                         <td className="border border-gray-300 py-2 text-center max-w-min">
                           {row.inst_code}

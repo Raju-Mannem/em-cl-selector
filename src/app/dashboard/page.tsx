@@ -10,8 +10,8 @@ const Dashboard = () => {
   };
   return (
     <main className="h-full w-full px-2 py-2">
-      <section className="flex justify-end items-center px-12 py-4 my-4 text-[8px] sm:text-sm font-sans bg-indigo-200">
-        <article className="px-2 mx-8 bg-stone-50 rounded-sm">
+      <section className="flex  justify-end gap-4 items-center px-12 py-4 my-4 text-[8px] sm:text-sm font-sans bg-indigo-200">
+        <article className="px-2 bg-stone-50 rounded-sm">
           <button
             onClick={() => handleSelect("colleges")}
             className="focus:outline-0"
@@ -19,7 +19,7 @@ const Dashboard = () => {
             College
           </button>
         </article>
-        <article className="px-2 mx-8 bg-stone-50 rounded-sm">
+        <article className="px-2 bg-stone-50 rounded-sm">
           <button
             onClick={() => handleSelect("cutoff")}
             className="focus:outline-0"
