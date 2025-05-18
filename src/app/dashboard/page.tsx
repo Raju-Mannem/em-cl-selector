@@ -1,7 +1,7 @@
 "use client";
 import { useState } from "react";
 import College from "@/components/College";
-import Cutoff2025 from "@/components/Cutoff2025";
+import Cutoff2024 from "@/components/Cutoff2024";
 
 const Dashboard = () => {
   const [selectType, setSelectType] = useState<string>("");
@@ -28,7 +28,7 @@ const Dashboard = () => {
           </button>
         </article>
       </section>
-      {selectType == "colleges" ? <College /> : <Cutoff2025 />}
+      {selectType == "colleges" ? <College /> : <Cutoff2024 />}
     </main>
   );
 };

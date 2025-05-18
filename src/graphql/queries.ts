@@ -30,9 +30,9 @@ export const GET_ALL_COLLEGES = gql`
   }
 `;
 
-export const GET_PAGINATED_TS_CUTOFF_2025S = gql`
-  query GetPaginatedTsCutoff2025s($limit: Int, $offset: Int) {
-    tsCutoff2025s(limit: $limit, offset: $offset) {
+export const GET_PAGINATED_TS_CUTOFF_2024S = gql`
+  query GetPaginatedTsCutoff2024s($limit: Int, $offset: Int) {
+    tsCutoff2024s(limit: $limit, offset: $offset) {
       rows {
         sno
         inst_code
@@ -68,9 +68,9 @@ export const GET_PAGINATED_TS_CUTOFF_2025S = gql`
   }
 `;
 
-export const GET_TS_CUTOFF_2025 = gql`
-  query GetTsCutoff2025($sno: Float!) {
-    tsCutoff2025(sno: $sno) {
+export const GET_TS_CUTOFF_2024 = gql`
+  query GetTsCutoff2024($sno: Float!) {
+    tsCutoff2024(sno: $sno) {
       sno
       inst_code
       institute_name
@@ -105,9 +105,9 @@ export const GET_TS_CUTOFF_2025 = gql`
   }
 `;
 
-export const GET_TS_CUTOFF_2025S_BY_INST_CODES = gql`
-  query GetTsCutoff2025sByInstCodes($inst_codes: [String!]!) {
-    tsCutoff2025sByInstCodes(inst_codes: $inst_codes) {
+export const GET_TS_CUTOFF_2024S_BY_INST_CODES = gql`
+  query GetTsCutoff2024sByInstCodes($inst_codes: [String!]!) {
+    tsCutoff2024sByInstCodes(inst_codes: $inst_codes) {
       sno
       inst_code
       institute_name
@@ -140,9 +140,9 @@ export const GET_TS_CUTOFF_2025S_BY_INST_CODES = gql`
   }
 `;
 
-export const GET_TS_CUTOFFS_2025_BY_RANK = gql`
-  query TsCutoff2025sByRank($filter: RankFilterInput!) {
-    tsCutoff2025sByRank(filter: $filter) {
+export const GET_TS_CUTOFFS_2024_BY_RANK = gql`
+  query TsCutoff2024sByRank($filter: RankFilterInput!) {
+    tsCutoff2024sByRank(filter: $filter) {
       sno
       inst_code
       institute_name
@@ -155,9 +155,9 @@ export const GET_TS_CUTOFFS_2025_BY_RANK = gql`
     }
   }
 `;
-export const GET_TS_CUTOFFS_2025_BY_RANK_DIST = gql`
-  query TsCutoff2025sByInstDist($filter: InstDistFilterInput!) {
-    tsCutoff2025sByInstDist(filter: $filter) {
+export const GET_TS_CUTOFFS_2024_BY_RANK_DIST = gql`
+  query TsCutoff2024sByInstDist($filter: InstDistFilterInput!) {
+    tsCutoff2024sByInstDist(filter: $filter) {
       sno
       inst_code
       institute_name

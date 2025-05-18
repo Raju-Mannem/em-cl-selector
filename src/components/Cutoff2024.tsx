@@ -2,8 +2,8 @@
 import React, { useState, useEffect } from "react";
 import { useLazyQuery } from "@apollo/client";
 import {
-  GET_TS_CUTOFFS_2025_BY_RANK,
-  // GET_TS_CUTOFFS_2025_BY_RANK_DIST,
+  GET_TS_CUTOFFS_2024_BY_RANK,
+  // GET_TS_CUTOFFS_2024_BY_RANK_DIST,
 } from "../graphql/queries";
 import { districtOptions } from "../data/districts";
 import { casteOptions } from "../data/caste";
@@ -18,7 +18,7 @@ interface TsCutoffData {
   inst_code: string;
 }
 
-interface tsCutoff2025sPdfData {
+interface tsCutoff2024sPdfData {
   sno: number;
   inst_code: string;
   institute_name: string;
@@ -44,7 +44,7 @@ export interface CutoffRow {
   };
 }
 
-const Cutoff2025 = () => {
+const Cutoff2024 = () => {
   const [minRank, setMinRank] = useState("");
   const [maxRank, setMaxRank] = useState("");
   const [selectedCastes, setSelectedCastes] = useState<string[]>([]);
@@ -56,14 +56,14 @@ const Cutoff2025 = () => {
   const [stdCaste, setStdCaste] = useState<string>("");
 
   const [fetchCutoffs, { data, loading, error }] = useLazyQuery(
-    GET_TS_CUTOFFS_2025_BY_RANK,
+    GET_TS_CUTOFFS_2024_BY_RANK,
     { errorPolicy: "all" }
   );
 
   // const [
   //   fetchRowsByInstDistCodes,
   //   { data: rowsData, loading: rowsLoading, error: rowsError },
-  // ] = useLazyQuery(GET_TS_CUTOFFS_2025_BY_RANK_DIST, { errorPolicy: "all" });
+  // ] = useLazyQuery(GET_TS_CUTOFFS_2024_BY_RANK_DIST, { errorPolicy: "all" });
 
   const handlePDF = () => {
     if (!stdName) {
@@ -83,8 +83,8 @@ const Cutoff2025 = () => {
       //   16
       // );
 
-      const tableData = data?.tsCutoff2025sByRank?.map(
-        (row: tsCutoff2025sPdfData, index: number) => ({
+      const tableData = data?.tsCutoff2024sByRank?.map(
+        (row: tsCutoff2024sPdfData, index: number) => ({
           sno: index + 1,
           inst_code: row.inst_code,
           institute_name: row.institute_name,
@@ -207,8 +207,8 @@ const Cutoff2025 = () => {
   };
 
   // useEffect(() => {
-  //   if (data && data.tsCutoff2025sByRank.length) {
-  //     const uniqueInstCodes = data.tsCutoff2025sByRank
+  //   if (data && data.tsCutoff2024sByRank.length) {
+  //     const uniqueInstCodes = data.tsCutoff2024sByRank
   //       .map((item: TsCutoffData) => item.inst_code)
   //       .filter(
   //         (value: TsCutoffData, index: number, self: TsCutoffData[]) =>
@@ -685,12 +685,12 @@ const Cutoff2025 = () => {
               Error: {rowsError.message}
             </div>
           )} */}
-          {data?.tsCutoff2025sByRank?.length === 0 && (
+          {data?.tsCutoff2024sByRank?.length === 0 && (
             <div className="text-red-500 text-center py-12 border-t text-sm">
               No rows found for the selected institute codes.
             </div>
           )}
-          {data?.tsCutoff2025sByRank?.length > 0 ? (
+          {data?.tsCutoff2024sByRank?.length > 0 ? (
             <div className="overflow-x-auto mt-6">
               <table className="min-w-full table-auto bg-white border border-collapse text-[4px] sm:text-[10px] font-sans">
                 <thead className="bg-emerald-700 text-neutral-100 font-extrabold">
@@ -727,7 +727,7 @@ const Cutoff2025 = () => {
                   </tr>
                 </thead>
                 <tbody className="text-neutral-900">
-                  {data.tsCutoff2025sByRank.map(
+                  {data.tsCutoff2024sByRank.map(
                     (row: CutoffRow, index: number) => (
                       <tr
                         key={row.sno}
@@ -783,4 +783,4 @@ const Cutoff2025 = () => {
   );
 };
 
-export default Cutoff2025;
+export default Cutoff2024;

@@ -18,8 +18,8 @@ model college {
   affiliated_to  String?
 }
 
-model ts_cutoff_2025 {
-  sno            Decimal  @id @db.Decimal
+model ts_cutoff_2024 {
+  sno            Decimal  @id(map: "ts_cutoff_2025_pkey") @db.Decimal
   inst_code      String?
   institute_name String?
   place          String?

@@ -10,7 +10,7 @@ const typeDefs = `#graphql
     affiliated_to: String!
   }
 
-  type TsCutoff2025 {
+  type TsCutoff2024 {
     sno: ID!
     inst_code: String
     institute_name: String
@@ -43,7 +43,7 @@ const typeDefs = `#graphql
     priority: Int
   }
 
-input TsCutoff2025Input {
+input TsCutoff2024Input {
 sno: ID!
 inst_code: String
 institute_name: String
@@ -92,7 +92,7 @@ priority: Int
     distCodes: [String!]
   }
 
-  type TsCutoff2025Dynamic {
+  type TsCutoff2024Dynamic {
     sno: ID!
     inst_code: String
     institute_name: String
@@ -109,11 +109,11 @@ priority: Int
   type Query {
     getCollege(institute_code: String!): College
     getColleges: [College!]!
-    tsCutoff2025s(limit: Int = 50, offset: Int = 0): [TsCutoff2025!]!
-    tsCutoff2025(sno: Float!): TsCutoff2025
-    tsCutoff2025sByInstCodes(inst_codes: [String!]!): [TsCutoff2025!]!
-    tsCutoff2025sByRank(filter: RankFilterInput!): [TsCutoff2025Dynamic!]!
-    tsCutoff2025sByInstDist(filter: InstDistFilterInput!): [TsCutoff2025Dynamic!]!
+    tsCutoff2024s(limit: Int = 50, offset: Int = 0): [TsCutoff2024!]!
+    tsCutoff2024(sno: Float!): TsCutoff2024
+    tsCutoff2024sByInstCodes(inst_codes: [String!]!): [TsCutoff2024!]!
+    tsCutoff2024sByRank(filter: RankFilterInput!): [TsCutoff2024Dynamic!]!
+    tsCutoff2024sByInstDist(filter: InstDistFilterInput!): [TsCutoff2024Dynamic!]!
   }
 
   type Mutation {
@@ -126,9 +126,9 @@ priority: Int
       co_educ: String!
       affiliated_to: String!
     ): College
-    createTsCutoff2025(data: TsCutoff2025Input!): TsCutoff2025!
-    updateTsCutoff2025(sno: Float!, data: TsCutoff2025Input!): TsCutoff2025!
-    deleteTsCutoff2025(sno: Float!): TsCutoff2025!
+    createTsCutoff2024(data: TsCutoff2024Input!): TsCutoff2024!
+    updateTsCutoff2024(sno: Float!, data: TsCutoff2024Input!): TsCutoff2024!
+    deleteTsCutoff2024(sno: Float!): TsCutoff2024!
   }
 `;
 

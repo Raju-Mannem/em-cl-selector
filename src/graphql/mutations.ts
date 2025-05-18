@@ -22,9 +22,9 @@ export const CREATE_COLLEGE = gql`
   }
 `;
 
-export const CREATE_TS_CUTOFF_2025 = gql`
-  mutation CreateTsCutoff2025($data: TsCutoff2025Input!) {
-    createTsCutoff2025(data: $data) {
+export const CREATE_TS_CUTOFF_2024 = gql`
+  mutation CreateTsCutoff2024($data: TsCutoff2024Input!) {
+    createTsCutoff2024(data: $data) {
       sno
       inst_code
       institute_name
@@ -59,9 +59,9 @@ export const CREATE_TS_CUTOFF_2025 = gql`
   }
 `;
 
-export const UPDATE_TS_CUTOFF_2025 = gql`
-  mutation UpdateTsCutoff2025($sno: Float!, $data: TsCutoff2025Input!) {
-    updateTsCutoff2025(sno: $sno, data: $data) {
+export const UPDATE_TS_CUTOFF_2024 = gql`
+  mutation UpdateTsCutoff2024($sno: Float!, $data: TsCutoff2024Input!) {
+    updateTsCutoff2024(sno: $sno, data: $data) {
       sno
       inst_code
       institute_name
@@ -96,9 +96,9 @@ export const UPDATE_TS_CUTOFF_2025 = gql`
   }
 `;
 
-export const DELETE_TS_CUTOFF_2025 = gql`
-  mutation DeleteTsCutoff2025($sno: Float!) {
-    deleteTsCutoff2025(sno: $sno) {
+export const DELETE_TS_CUTOFF_2024 = gql`
+  mutation DeleteTsCutoff2024($sno: Float!) {
+    deleteTsCutoff2024(sno: $sno) {
       sno
     }
   }
