@@ -51,3 +51,40 @@ model ts_cutoff_2024 {
   affiliated_to  String?
   priority       Int?
 }
+
+model ts_cutoff_2025 {
+  sno            Int     @id(map: "ts_cutoff_2025_pkey1")
+  inst_code      String?
+  institute_name String?
+  place          String?
+  dist_code      String?
+  co_education   String?
+  college_type   String?
+  branch_code    String?
+  branch_name    String?
+  oc_boys        Int?
+  oc_girls       Int?
+  ba_a_boys      Int?
+  ba_a_girls     Int?
+  bc_b_boys      Int?
+  bc_b_girls     Int?
+  bc_c_boys      Int?
+  bc_c_girls     Int?
+  bc_d_boys      Int?
+  bc_d_girls     Int?
+  bc_e_boys      Int?
+  bc_e_girls     Int?
+  sc_1_boys      Int?
+  sc_1_girls     Int?
+  sc_2_boys      Int?
+  sc_2_girls     Int?
+  sc_3_boys      Int?
+  sc_3_girls     Int?
+  st_boys        Int?
+  st_girls       Int?
+  ews_boys       Int?
+  ews_girls      Int?
+  affiliated_to  String?
+  phase          Int?
+  priority       Int?
+}
