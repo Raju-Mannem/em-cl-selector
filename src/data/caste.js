@@ -20,7 +20,8 @@ export const casteOptions = [
   ];
 
 export const casteOptions2025 = [
-{ label: 'oc_boys	oc_girls', value: 'oc_boys' },
+{ label: 'oc_boys', value: 'oc_boys' },
+{ label: 'oc_girls', value: 'oc_girls' },
 { label: 'ba_a_boys', value: 'ba_a_boys' },
 { label: 'ba_a_girls', value: 'ba_a_girls' },
 { label: 'bc_b_boys', value: 'bc_b_boys' },

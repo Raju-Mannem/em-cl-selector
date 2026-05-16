@@ -45,6 +45,18 @@ export interface CutoffRow {
   };
 }
 
+type ColumnKey =
+  | "sno"
+  | "inst_code"
+  | "institute_name"
+  | "branch_code"
+  | "branch_name"
+  | "dist_code"
+  | "place"
+  | "phase"
+  | "priority"
+  | string;
+
 const Cutoff2025 = () => {
   const [minRank, setMinRank] = useState("");
   const [maxRank, setMaxRank] = useState("");
@@ -60,13 +72,36 @@ const Cutoff2025 = () => {
   const [coEdu, setCoEdu] = useState<boolean>(false);
   const [result, setResult] = useState<CutoffRow[]>([]);
 
+  const [selectedColumns, setSelectedColumns] = useState<ColumnKey[]>([
+    "sno",
+    "inst_code",
+    "institute_name",
+    "branch_code",
+    "branch_name",
+  ]);
+
+  const baseColumns: { label: string; value: ColumnKey }[] = [
+    { label: "S.NO", value: "sno" },
+    { label: "College Code", value: "inst_code" },
+    { label: "College Name", value: "institute_name" },
+    { label: "Branch Code", value: "branch_code" },
+    { label: "Branch Name", value: "branch_name" },
+    { label: "District Code", value: "dist_code" },
+    { label: "Place", value: "place" },
+    { label: "Priority", value: "priority" },
+    { label: "Phase", value: "phase" },
+  ];
+
   const [fetchCutoffs, { data, loading, error }] = useLazyQuery(
     GET_TS_CUTOFFS_2025_BY_RANK,
     { errorPolicy: "all" },
   );
 
   const handlePDF = () => {
-    if (!stdName) {
+    if (selectedColumns.length === 0) {
+      toast.error("Please select at least one column");
+      return;
+    } else if (!stdName) {
       toast.error("invalid details");
     } else {
       const doc = new jsPDF();
@@ -83,16 +118,31 @@ const Cutoff2025 = () => {
       //   16
       // );
 
-      const tableData = result?.map((row: CutoffRow, index: number) => ({
-        sno: index + 1,
-        inst_code: row.inst_code,
-        institute_name: row.institute_name,
-        branch_code: row.branch_code,
-        branch_name: row.branch_name,
-        dist_code: row.dist_code,
-        place: row.place,
-        co_education: row.co_education, // keep for logic, not display
-      }));
+      const pdfColumns = [
+        ...baseColumns.filter((c) => selectedColumns.includes(c.value)),
+        ...selectedCastes.map((caste) => ({
+          label: caste,
+          value: caste,
+        })),
+      ];
+
+      const tableData = result?.map((row: CutoffRow, index: number) => {
+        const newRow: any = {};
+
+        pdfColumns.forEach((col) => {
+          if (col.value === "sno") {
+            newRow.sno = index + 1;
+          } else if (col.value in (row.dynamicCastes || {})) {
+            // caste column
+            newRow[col.value] = row.dynamicCastes?.[col.value] ?? "-";
+          } else {
+            // normal field
+            newRow[col.value] = (row as any)[col.value];
+          }
+        });
+
+        return newRow;
+      });
 
       const firstTableColumn = [
         `Name: ${stdName} `,
@@ -100,15 +150,10 @@ const Cutoff2025 = () => {
         `Caste: ${stdCaste} `,
       ];
 
-      const tableColumn = [
-        { header: "S.NO", dataKey: "sno" },
-        { header: "College Code", dataKey: "inst_code" },
-        { header: "College Name", dataKey: "institute_name" },
-        { header: "Branch Code", dataKey: "branch_code" },
-        { header: "Branch Name", dataKey: "branch_name" },
-        { header: "District Code", dataKey: "dist_code" },
-        { header: "Place", dataKey: "place" },
-      ];
+      const tableColumn = pdfColumns.map((col) => ({
+        header: col.label,
+        dataKey: col.value,
+      }));
 
       autoTable(doc, {
         head: [firstTableColumn],
@@ -125,22 +170,28 @@ const Cutoff2025 = () => {
           halign: "center",
         },
         headStyles: {
-          fillColor: [236, 250, 229], // light green header background
-          textColor: [16, 46, 80], // Navy blue header text
+          fillColor: [249, 250, 251], // #f9fafb
+          textColor: [30, 41, 59], // slate-800 (premium dark gray)
           fontStyle: "bold",
           halign: "center",
+        },
+        bodyStyles: {
+          fillColor: [249, 250, 251],
         },
         columnStyles: {
           0: { halign: "center", fontStyle: "bold" }, // first column centered and bold
           1: { halign: "center" },
         },
-        theme: "plain", // Use 'plain' to avoid built-in styling interference
+        theme: "plain", // plain to avoid built-in styling interference
       });
 
       autoTable(doc, {
-        columns: tableColumn,
-        body: tableData,
+        head: [tableColumn.map((c) => c.header)],
+        body: tableData.map((row) =>
+          tableColumn.map((col) => row[col.dataKey]),
+        ),
         startY: 34,
+        theme: "grid",
         margin: { top: 10, bottom: 10 },
         styles: {
           fontSize: 9,
@@ -148,16 +199,13 @@ const Cutoff2025 = () => {
           minCellHeight: 14,
           valign: "middle",
         },
-        columnStyles: {
-          2: { cellWidth: "auto", halign: "left" },
-          0: { halign: "center" },
-          1: { halign: "center" },
-          3: { halign: "center" },
-          4: { halign: "left" },
-          5: { halign: "center" },
-          6: { halign: "center" },
+
+        headStyles: {
+          fillColor: [15, 23, 42], // navy blue
+          textColor: [255, 255, 255], // white
+          fontStyle: "bold",
+          halign: "center",
         },
-        theme: "grid",
         didParseCell: function (data) {
           if (data.section === "body") {
             const raw = data.row.raw;
@@ -170,6 +218,28 @@ const Cutoff2025 = () => {
               data.cell.styles.textColor = [233, 30, 99]; // Pink
             }
           }
+        },
+        didDrawPage: (data) => {
+          const pageSize = doc.internal.pageSize;
+          const pageWidth = pageSize.width || doc.internal.pageSize.getWidth();
+          const pageHeight =
+            pageSize.height || doc.internal.pageSize.getHeight();
+
+          const footerText = "@Bestcareerguidance | Mentorship: 8179406281";
+
+          const footerY = pageHeight - 6;
+
+          // line above footer
+          doc.setDrawColor(226, 232, 240);
+          doc.setLineWidth(0.2);
+          doc.line(10, footerY - 6, pageWidth - 10, footerY - 4);
+
+          // footer text
+          doc.setFontSize(9);
+          doc.setTextColor(100, 116, 139);
+          doc.text(footerText, pageWidth / 2, footerY, {
+            align: "center",
+          });
         },
       });
 
@@ -537,9 +607,13 @@ const Cutoff2025 = () => {
                       <input
                         type="checkbox"
                         className="size-2 sm:size-5 rounded border-gray-300 shadow-sm"
-                        checked={selectedCastes.length === casteOptions2025.length}
+                        checked={
+                          selectedCastes.length === casteOptions2025.length
+                        }
                         onChange={() => {
-                          if (selectedCastes.length === casteOptions2025.length) {
+                          if (
+                            selectedCastes.length === casteOptions2025.length
+                          ) {
                             // Deselect all
                             setSelectedCastes([]);
                           } else {
@@ -808,6 +882,30 @@ const Cutoff2025 = () => {
             </button>
           </span>
         </div>
+        <div className="mt-4 bg-indigo-100 border-1 border-indigo-200 p-4 rounded-lg">
+          <p className="font-semibold mb-2">Select Columns for PDF</p>
+
+          <div className="flex flex-wrap gap-3">
+            {baseColumns.map((col) => (
+              <label key={col.value} className="flex items-center gap-2">
+                <input
+                  type="checkbox"
+                  checked={selectedColumns.includes(col.value)}
+                  onChange={(e) => {
+                    const checked = e.target.checked;
+
+                    setSelectedColumns((prev) =>
+                      checked
+                        ? [...prev, col.value]
+                        : prev.filter((c) => c !== col.value),
+                    );
+                  }}
+                />
+                {col.label}
+              </label>
+            ))}
+          </div>
+        </div>
         <div className="mt-8">
           {loading && (
             <div className="flex justify-center align-center gap-2 text-indigo-500 text-center">
@@ -884,6 +982,9 @@ const Cutoff2025 = () => {
                       Place
                     </th>
                     <th className="border border-gray-300 pl-2 py-2 w-xs  text-left py-2 break-all">
+                      Co Education
+                    </th>
+                    <th className="border border-gray-300 pl-2 py-2 w-xs  text-left py-2 break-all">
                       Priority
                     </th>
                     <th className="border border-gray-300 pl-2 py-2 w-xs  text-left py-2 break-all">
@@ -948,6 +1049,9 @@ const Cutoff2025 = () => {
                       </td>
                       <td className="border border-gray-300 pl-2 py-2 break-all">
                         {row.place}
+                      </td>
+                      <td className="border border-gray-300 py-2 text-center max-w-min">
+                        {row.co_education}
                       </td>
                       <td className="border border-gray-300 pl-2 py-2 break-all">
                         {row.priority}
