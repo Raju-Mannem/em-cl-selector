@@ -18,3 +18,28 @@ export const casteOptions = [
     { label: 'ESW GEN OU', value: 'ews_gen_ou' },
     { label: 'EWS Girls OU', value: 'ews_girls_ou' },
   ];
+
+export const casteOptions2025 = [
+{ label: 'oc_boys	oc_girls', value: 'oc_boys' },
+{ label: 'ba_a_boys', value: 'ba_a_boys' },
+{ label: 'ba_a_girls', value: 'ba_a_girls' },
+{ label: 'bc_b_boys', value: 'bc_b_boys' },
+{ label: 'bc_b_girls', value: 'bc_b_girls' },
+{ label: 'bc_c_boys', value: 'bc_c_boys' },
+{ label: 'bc_c_girls', value: 'bc_c_girls' },
+{ label: 'bc_d_boys', value: 'bc_d_boys' },
+{ label: 'bc_d_girls', value: 'bc_d_girls' },
+{ label: 'bc_e_boys', value: 'bc_e_boys' },
+{ label: 'bc_e_girls', value: 'bc_e_girls' },
+{ label: 'sc_1_boys', value: 'sc_1_boys' },
+{ label: 'sc_1_girls', value: 'sc_1_girls' },
+{ label: 'sc_2_boys', value: 'sc_2_boys' },
+{ label: 'sc_2_girls', value: 'sc_2_girls' },
+{ label: 'sc_3_boys', value: 'sc_3_boys' },
+{ label: 'sc_3_girls', value: 'sc_3_girls' },
+{ label: 'st_boys', value: 'st_boys' },
+{ label: 'st_girls', value: 'st_girls' },
+{ label: 'ews_boys', value: 'ews_boys' },
+{ label: 'ews_girls', value: 'ews_girls' },
+
+]
