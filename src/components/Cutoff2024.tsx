@@ -246,8 +246,9 @@ const Cutoff2024 = () => {
   // }, [data, fetchRowsByInstDistCodes]);
 
   return (
-    <section className="flex justify-center items-center flex-col overflow-x-auto py-2 sm:py-4 sm:px-8 text-[6px] sm:text-[12px] font-sans">
+    <section className="bg-gray-50 flex justify-center items-center flex-col overflow-x-auto py-2 sm:py-4 sm:px-8 text-[6px] sm:text-[12px] font-sans">
       <article className="w-full h-full">
+        <h1 className="text-xl text-center text-gray-500 bg-indigo-100 border-2 border-white mb-8 py-2 rounded-lg">2024 TG Cutoff</h1>
         <form
           className="flex justify-start flex-wrap items-start gap-2"
           onSubmit={handleSubmit}
