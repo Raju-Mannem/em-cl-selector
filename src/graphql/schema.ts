@@ -43,6 +43,43 @@ const typeDefs = `#graphql
     priority: Int
   }
 
+  type tsCutoff2025 {
+    sno: ID!
+    inst_code: String
+    institute_name: String
+    place: String
+    dist_code: String
+    co_education: String
+    college_type: String
+    branch_code: String
+    branch_name: String
+    oc_boys: Int
+    oc_girls: Int
+    ba_a_boys: Int
+    ba_a_girls: Int
+    bc_b_boys: Int
+    bc_b_girls: Int
+    bc_c_boys: Int
+    bc_c_girls: Int
+    bc_d_boys: Int
+    bc_d_girls: Int
+    bc_e_boys: Int
+    bc_e_girls: Int
+    sc_1_boys: Int
+    sc_1_girls: Int
+    sc_2_boys: Int
+    sc_2_girls: Int
+    sc_3_boys: Int
+    sc_3_girls: Int
+    st_boys: Int
+    st_girls: Int
+    ews_boys: Int
+    ews_girls: Int
+    affiliated_to: String
+    phase: Int
+    priority: Int
+  }
+
 input TsCutoff2024Input {
 sno: ID!
 inst_code: String
@@ -85,6 +122,17 @@ priority: Int
     distCodes: [String!]
     coEdu: Boolean
   }
+  
+  input RankPhaseFilterInput {
+    minRank: Int!
+    maxRank: Int!
+    instituteName: [String!]
+    branchCodes: [String!]
+    casteColumns: [String!]
+    distCodes: [String!]
+    coEdu: Boolean
+    phase: Int
+  }
 
   input InstDistFilterInput{
     instCodes: [String!]!
@@ -106,6 +154,20 @@ priority: Int
     dynamicCastes: JSON
   }
 
+  type TsCutoff2025Dynamic {
+    sno: ID!
+    inst_code: String
+    institute_name: String
+    place: String
+    dist_code: String
+    branch_name: String
+    branch_code: String
+    co_education: String
+    phase: String
+    priority: Int
+    dynamicCastes: JSON
+  }
+
   scalar JSON
 
   type Query {
@@ -115,6 +177,7 @@ priority: Int
     tsCutoff2024(sno: Float!): TsCutoff2024
     tsCutoff2024sByInstCodes(inst_codes: [String!]!): [TsCutoff2024!]!
     tsCutoff2024sByRank(filter: RankFilterInput!): [TsCutoff2024Dynamic!]!
+    tsCutoff2025ByRank(filter: RankPhaseFilterInput!): [TsCutoff2025Dynamic!]!
     tsCutoff2024sByInstDist(filter: InstDistFilterInput!): [TsCutoff2024Dynamic!]!
   }
 

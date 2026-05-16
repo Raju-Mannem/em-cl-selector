@@ -155,6 +155,23 @@ export const GET_TS_CUTOFFS_2024_BY_RANK = gql`
     }
   }
 `;
+export const GET_TS_CUTOFFS_2025_BY_RANK = gql`
+  query TsCutoff2025ByRank($filter: RankPhaseFilterInput!) {
+    tsCutoff2025ByRank(filter: $filter) {
+      sno
+      inst_code
+      institute_name
+      branch_code
+      branch_name
+      dist_code
+      place
+      dynamicCastes
+      co_education
+      phase
+      priority
+    }
+  }
+`;
 export const GET_TS_CUTOFFS_2024_BY_RANK_DIST = gql`
   query TsCutoff2024sByInstDist($filter: InstDistFilterInput!) {
     tsCutoff2024sByInstDist(filter: $filter) {

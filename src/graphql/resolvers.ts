@@ -152,7 +152,7 @@ const resolvers = {
       );
       // console.log('Filtered rows:', filteredRows.length);
 
-      // ✅ 3. Create a branch code order map for fast lookup
+      // 3. Create a branch code order map for fast lookup
       const branchOrderMap = new Map<string, number>(
         branchCodes.map((code: string, index: number) => [code, index])
       );
@@ -180,6 +180,73 @@ const resolvers = {
         branch_code: row.branch_code,
         branch_name: row.branch_name,
         co_education: row.co_education,
+        dynamicCastes: Object.fromEntries(
+          casteColumns.map((col: any) => [col, row[col as keyof typeof row]])
+        ),
+      }));
+    },
+    tsCutoff2025ByRank: async (
+      __parent: any,
+      args: { filter: any },
+      context: Context
+    ) => {
+      const { minRank, maxRank, instituteName, branchCodes, casteColumns, distCodes, coEdu, phase } =
+        args.filter;
+        const whereClause: any = {
+          ...(instituteName && { institute_name: { in: instituteName} }),
+          branch_code: { in: branchCodes },
+          dist_code: { in: distCodes },
+          ...(coEdu && { co_education: "GIRLS" }),
+          ...(phase && { phase: phase })
+        };
+
+      // 1. Fetch rows
+      const rows = await context.prisma.ts_cutoff_2025.findMany({
+        where: whereClause,
+        orderBy: {
+          priority: "asc",
+        },
+      });
+      // console.log("---------------rows log",JSON.stringify(rows));
+      // 2. Filter rows: ALL selected caste columns must be within [minRank, maxRank]
+      const filteredRows = rows.filter((row) =>
+        casteColumns.every((col: any) => {
+          const rawValue = row[col as keyof typeof row];
+          if (rawValue === null || rawValue === undefined) return false;
+          const value = toNumber(rawValue);
+          return value! >= minRank && value! <= maxRank;
+        })
+      );
+      // 3. Create a branch code order map for fast lookup
+      const branchOrderMap = new Map<string, number>(
+        branchCodes.map((code: string, index: number) => [code, index])
+      );
+
+      const sortedRows = filteredRows.sort((a, b) => {
+        // priority is Int? (number | null)
+        const priorityA = a.priority ?? 0;
+        const priorityB = b.priority ?? 0;
+        const priorityDiff = priorityA - priorityB;
+        if (priorityDiff !== 0) return priorityDiff;
+        const branchAOrder =
+          branchOrderMap.get(a.branch_code ?? "") ?? Number.MAX_SAFE_INTEGER;
+        const branchBOrder =
+          branchOrderMap.get(b.branch_code ?? "") ?? Number.MAX_SAFE_INTEGER;
+        return branchAOrder - branchBOrder;
+      });
+
+      // 4. Map to result
+      return filteredRows.map((row) => ({
+        sno: row.sno,
+        inst_code: row.inst_code,
+        institute_name: row.institute_name,
+        place: row.place,
+        dist_code: row.dist_code,
+        branch_code: row.branch_code,
+        branch_name: row.branch_name,
+        co_education: row.co_education,
+        phase: row.phase,
+        priority: row.priority,
         dynamicCastes: Object.fromEntries(
           casteColumns.map((col: any) => [col, row[col as keyof typeof row]])
         ),
