@@ -155,9 +155,26 @@ const Cutoff2025 = () => {
         dataKey: col.value,
       }));
 
+      const pageWidth = doc.internal.pageSize.getWidth();
+
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(18);
+      doc.setTextColor(15, 23, 42); // navy blue
+      doc.text("Bestcareerguidance", pageWidth / 2, 14, {
+        align: "center",
+      });
+
+      // 2nd line
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(24);
+      doc.setTextColor(37, 150, 190); //
+      doc.text("Mentorship: 8179406281", pageWidth / 2, 24, {
+        align: "center",
+      });
+
       autoTable(doc, {
         head: [firstTableColumn],
-        startY: 14,
+        startY: 34,
         margin: { top: 10 },
         styles: {
           fontSize: 9,
@@ -190,7 +207,7 @@ const Cutoff2025 = () => {
         body: tableData.map((row) =>
           tableColumn.map((col) => row[col.dataKey]),
         ),
-        startY: 34,
+        startY: 54,
         theme: "grid",
         margin: { top: 10, bottom: 10 },
         styles: {
@@ -201,7 +218,7 @@ const Cutoff2025 = () => {
         },
 
         headStyles: {
-          fillColor: [15, 23, 42], // navy blue
+          fillColor: [37, 150, 190],
           textColor: [255, 255, 255], // white
           fontStyle: "bold",
           halign: "center",
