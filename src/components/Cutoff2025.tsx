@@ -160,7 +160,7 @@ const Cutoff2025 = () => {
       doc.setFont("helvetica", "bold");
       doc.setFontSize(18);
       doc.setTextColor(15, 23, 42); // navy blue
-      doc.text("Bestcareerguidance", pageWidth / 2, 14, {
+      doc.text("@Bestcareerguidance", pageWidth / 2, 14, {
         align: "center",
       });
 
