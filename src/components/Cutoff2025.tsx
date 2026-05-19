@@ -80,6 +80,11 @@ const Cutoff2025 = () => {
     "branch_name",
   ]);
 
+  const [rangeDelete, setRangeDelete] = useState({
+    min: "",
+    max: "",
+  });
+
   const baseColumns: { label: string; value: ColumnKey }[] = [
     { label: "S.NO", value: "sno" },
     { label: "College Code", value: "inst_code" },
@@ -90,6 +95,14 @@ const Cutoff2025 = () => {
     { label: "Place", value: "place" },
     { label: "Priority", value: "priority" },
     { label: "Phase", value: "phase" },
+  ];
+
+  const pdfSelectableColumns = [
+    ...baseColumns,
+    ...selectedCastes.map((caste) => ({
+      label: caste,
+      value: caste,
+    })),
   ];
 
   const [fetchCutoffs, { data, loading, error }] = useLazyQuery(
@@ -118,13 +131,9 @@ const Cutoff2025 = () => {
       //   16
       // );
 
-      const pdfColumns = [
-        ...baseColumns.filter((c) => selectedColumns.includes(c.value)),
-        ...selectedCastes.map((caste) => ({
-          label: caste,
-          value: caste,
-        })),
-      ];
+      const pdfColumns = pdfSelectableColumns.filter((c) =>
+        selectedColumns.includes(c.value),
+      );
 
       const tableData = result?.map((row: CutoffRow, index: number) => {
         const newRow: any = {};
@@ -301,6 +310,27 @@ const Cutoff2025 = () => {
 
   const handleDelete = (sno: number) => {
     setResult((prevItems) => prevItems.filter((item) => item.sno !== sno));
+  };
+
+  const handleRangeDelete = (min: number, max: number) => {
+    if (isNaN(min) || isNaN(max) || min < 1 || max < 1 || min > max) {
+      toast.error("Invalid range");
+      return;
+    }
+
+    setResult((prev) =>
+      prev.filter((_, index) => {
+        const rowNumber = index + 1;
+        return rowNumber < min || rowNumber > max;
+      }),
+    );
+
+    toast.success(`Deleted rows ${min} to ${max}`);
+
+    setRangeDelete({
+      min: "",
+      max: "",
+    });
   };
 
   return (
@@ -892,7 +922,7 @@ const Cutoff2025 = () => {
           <span>
             <button
               type="submit"
-              className="justify-self-end basis-1/12 sm:ml-4 mt-2 sm:mt-6 bg-emerald-700 px-4 py-2 font-semibold text-white rounded hover:bg-indigo-700 transition"
+              className="justify-self-end basis-1/12 sm:ml-4 mt-2 sm:mt-6 bg-emerald-700 px-4 py-2 font-semibold text-white rounded hover:bg-emerald-700/80 transition"
               onClick={() => handlePDF()}
             >
               print
@@ -903,7 +933,7 @@ const Cutoff2025 = () => {
           <p className="font-semibold mb-2">Select Columns for PDF</p>
 
           <div className="flex flex-wrap gap-3">
-            {baseColumns.map((col) => (
+            {pdfSelectableColumns.map((col) => (
               <label key={col.value} className="flex items-center gap-2">
                 <input
                   type="checkbox"
@@ -974,6 +1004,49 @@ const Cutoff2025 = () => {
           )}
           {result?.length > 0 ? (
             <div className="overflow-x-auto mt-6">
+              <div className="flex justify-left items-center gap-2 bg-indigo-50 my-4 w-max p-4 rounded-lg">
+                <strong className="text-emerald-800">Range Delete: </strong>
+                <input
+                  type="number"
+                  placeholder="min"
+                  value={rangeDelete.min}
+                  onChange={(e) =>
+                    setRangeDelete((prev) => ({
+                      ...prev,
+                      min: e.target.value,
+                    }))
+                  }
+                  className="w-[80px] px-2 py-2 border border-indigo-200 rounded focus:outline-none"
+                  min={1}
+                />
+
+                <input
+                  type="number"
+                  placeholder="max"
+                  value={rangeDelete.max}
+                  onChange={(e) =>
+                    setRangeDelete((prev) => ({
+                      ...prev,
+                      max: e.target.value,
+                    }))
+                  }
+                  className="w-[80px] px-2 py-2 border border-indigo-200 rounded focus:outline-none"
+                  min={1}
+                />
+
+                <button
+                  type="button"
+                  onClick={() =>
+                    handleRangeDelete(
+                      Number(rangeDelete.min),
+                      Number(rangeDelete.max),
+                    )
+                  }
+                  className="px-4 py-2 text-white font-semibold rounded bg-emerald-700 transition hover:bg-emerald-700/60"
+                >
+                  Delete
+                </button>
+              </div>
               <table className="min-w-full table-auto bg-white border border-collapse text-[4px] sm:text-[10px] font-sans">
                 <thead className="bg-emerald-700 text-neutral-100 font-extrabold">
                   <tr className="">
